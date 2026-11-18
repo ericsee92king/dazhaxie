@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10120f">
+  <title>大闸蟹 · 每日能量</title>
+  <style>
+    :root { color-scheme: dark; --bg:#10120f; --panel:#1b1e19; --muted:#9da397; --lime:#c9f36a; --line:rgba(255,255,255,.09); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(ellipse at 50% 4%,rgba(181,224,91,.12),transparent 34rem),var(--bg); color:#f5f6ef; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+    button { font:inherit; }
+    .app { width:min(100%,480px); min-height:100vh; margin:auto; padding:22px 20px 34px; }
+    .topbar,.brand,.profile,.section-heading,.invite-row { display:flex; align-items:center; }
+    .topbar { justify-content:space-between; }
+    .brand { gap:10px; font-size:15px; font-weight:800; letter-spacing:2px; }
+    .logo { display:grid; width:36px; height:36px; place-items:center; border-radius:12px; background:var(--lime); color:#18200d; font-size:21px; }
+    .profile { gap:8px; color:#e7e9e2; font-size:13px; }
+    .avatar { display:grid; width:34px; height:34px; place-items:center; border:1px solid var(--line); border-radius:50%; background:#282c25; }
+    .eyebrow { margin:36px 0 8px; color:var(--muted); font-size:12px; letter-spacing:1.4px; }
+    h1 { margin:0; font-size:clamp(29px,8vw,38px); letter-spacing:-1.5px; }
+    .subtitle { margin:10px 0 25px; color:var(--muted); font-size:14px; }
+    .balance-card { position:relative; overflow:hidden; padding:22px; border:1px solid rgba(201,243,106,.18); border-radius:24px; background:linear-gradient(140deg,#252b1e,#1a1d17 67%); }
+    .balance-card::after { position:absolute; top:-60px; right:-40px; width:170px; height:170px; border:1px solid rgba(201,243,106,.12); border-radius:50%; box-shadow:0 0 0 20px rgba(201,243,106,.025),0 0 0 40px rgba(201,243,106,.02); content:""; }
+    .balance-label { color:#b7bcae; font-size:13px; }
+    .balance { margin:12px 0 4px; color:var(--lime); font-size:42px; font-weight:750; letter-spacing:-2px; }
+    .unit { color:#c3c8ba; font-size:14px; }
+    .rate { margin-top:21px; color:#b7bcae; font-size:12px; }
+    .rate strong { color:#f0f3e7; }
+    .mine-card { margin-top:16px; padding:23px 20px 20px; border:1px solid var(--line); border-radius:24px; background:var(--panel); text-align:center; }
+    .status { display:inline-flex; align-items:center; gap:7px; padding:7px 11px; border:1px solid var(--line); border-radius:99px; color:#c2c6bb; font-size:12px; }
+    .dot { width:7px; height:7px; border-radius:50%; background:#777d70; }
+    .is-mining .dot { background:var(--lime); box-shadow:0 0 10px var(--lime); }
+    .orb-wrap { display:grid; width:190px; height:190px; margin:20px auto 16px; place-items:center; border:1px solid rgba(201,243,106,.12); border-radius:50%; background:radial-gradient(circle,rgba(201,243,106,.09),transparent 68%); }
+    .orb { display:grid; width:140px; height:140px; place-items:center; border:1px solid rgba(201,243,106,.55); border-radius:50%; background:radial-gradient(circle at 35% 30%,#39452b,#20271a 58%,#171a15); box-shadow:0 0 34px rgba(201,243,106,.14),inset 0 0 25px rgba(201,243,106,.08); color:var(--lime); font-size:52px; transition:.3s; }
+    .is-mining .orb { animation:pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { transform:scale(1.045); box-shadow:0 0 48px rgba(201,243,106,.28); } }
+    .timer { font-size:25px; font-weight:700; letter-spacing:2px; }
+    .timer-caption { margin-top:5px; color:var(--muted); font-size:12px; }
+    .mine-button { width:100%; margin-top:20px; padding:15px; border:0; border-radius:15px; background:var(--lime); color:#18200d; font-weight:750; cursor:pointer; transition:.15s; }
+    .mine-button:active { transform:scale(.98); }
+    .mine-button.running { border:1px solid var(--line); background:#292d25; color:#e4e8dc; }
+    .section-heading { justify-content:space-between; margin:28px 2px 12px; }
+    .section-heading h2 { margin:0; font-size:16px; }
+    .section-heading span { color:var(--muted); font-size:12px; }
+    .invite-card { padding:17px; border:1px solid var(--line); border-radius:20px; background:var(--panel); }
+    .invite-row { justify-content:space-between; gap:12px; }
+    .invite-icon { display:grid; flex:0 0 42px; height:42px; place-items:center; border-radius:14px; background:#2a3020; color:var(--lime); font-size:20px; }
+    .invite-copy { flex:1; }
+    .invite-copy strong { display:block; font-size:14px; }
+    .invite-copy small { display:block; margin-top:5px; color:var(--muted); font-size:11px; }
+    .copy-button { padding:10px 12px; border:1px solid rgba(201,243,106,.35); border-radius:12px; background:transparent; color:var(--lime); font-size:12px; cursor:pointer; }
+    .notice { margin:18px 4px 0; color:#777d72; font-size:11px; line-height:1.6; text-align:center; }
+    .toast { position:fixed; right:20px; bottom:24px; left:20px; width:fit-content; max-width:calc(100% - 40px); margin:auto; padding:11px 16px; border:1px solid var(--line); border-radius:99px; background:#292d25; font-size:13px; opacity:0; pointer-events:none; transform:translateY(8px); transition:.2s; }
+    .toast.show { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="logo">✳</span> 大闸蟹</div>
+      <div class="profile"><span class="avatar">👤</span><span>探索者</span></div>
+    </header>
+    <p class="eyebrow">你的每日能量站</p>
+    <h1>让每一天，<br>都有一点收获。</h1>
+    <p class="subtitle">轻轻一点，开启今日能量循环。</p>
+    <section class="balance-card">
+      <div class="balance-label">累计能量积分</div>
+      <div class="balance" id="balance">0.00</div>
+      <div class="unit">蟹能量 · 演示积分</div>
+      <div class="rate">当前模拟速率　<strong>+0.08 / 小时</strong></div>
+    </section>
+    <section class="mine-card" id="mineCard">
+      <div class="status" id="status"><span class="dot"></span><span id="statusText">今日尚未启动</span></div>
+      <div class="orb-wrap"><div class="orb">🦀</div></div>
+      <div class="timer" id="timer">00:00:00</div>
+      <div class="timer-caption">本轮能量计时</div>
+      <button class="mine-button" id="mineButton">开始今日能量</button>
+    </section>
+    <div class="section-heading"><h2>邀请伙伴</h2><span>一起开启探索</span></div>
+    <section class="invite-card">
+      <div class="invite-row">
+        <div class="invite-icon">↗</div>
+        <div class="invite-copy"><strong>分享你的邀请链接</strong><small>邀请功能为演示界面</small></div>
+        <button class="copy-button" id="copyButton">复制链接</button>
+      </div>
+    </section>
+    <p class="notice">演示项目 · 积分和计时仅保存在当前浏览器中。<br>不涉及真实挖矿、代币、交易或收益承诺。</p>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    const STORAGE_KEY='dazhaxie-demo-v1', DAY_MS=86400000, RATE=0.08;
+    const $=id=>document.getElementById(id);
+    let session=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
+    let toastTimer;
+    function formatTime(ms){const s=Math.max(0,Math.floor(ms/1000));return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,'0')).join(':')}
+    function render(){const now=Date.now(),active=session&&now<session.endsAt,elapsed=session?Math.min(now-session.startedAt,DAY_MS):0;$('balance').textContent=(elapsed/3600000*RATE).toFixed(2);$('timer').textContent=session?formatTime(Math.max(0,session.endsAt-now)):'00:00:00';$('mineCard').classList.toggle('is-mining',!!active);$('statusText').textContent=active?'能量循环进行中':session?'本轮演示已结束':'今日尚未启动';$('mineButton').textContent=active?'能量循环进行中':session?'今日已完成':'开始今日能量';$('mineButton').classList.toggle('running',!!session);$('mineButton').disabled=!!session}
+    function toast(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+    $('mineButton').addEventListener('click',()=>{if(session)return;const startedAt=Date.now();session={startedAt,endsAt:startedAt+DAY_MS};localStorage.setItem(STORAGE_KEY,JSON.stringify(session));render();toast('今日演示计时已开启')});
+    $('copyButton').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href.split('#')[0]+'#invite-demo');toast('演示邀请链接已复制')}catch{toast('当前浏览器不支持自动复制')}});
+    render();setInterval(render,1000);
+  </script>
+</body>
+</html>
